@@ -32,10 +32,10 @@ describe('Tycoon', () => {
   });
 
   it('when there is no need to travel, arrival time is zero', () => {
-    expect(new Estimate().toArrival([])).toBe(0);
+    expect(new Estimate().toArrival(['No need to travel'])).toBe(0);
   });
 
-  it('if the distance from Factory to Warehouse B is 0, then the estimate is 0', () => {
-    expect(new Estimate().toArrival(['Send cargo to warehouse B'])).toBe(0);
+  it('if the distance from Factory to Warehouse B is 1, then the estimate is 1', () => {
+    expect(new Estimate(1).toArrival(['Send cargo to warehouse B'])).toBe(1);
   });
 });
