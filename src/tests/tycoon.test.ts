@@ -23,7 +23,7 @@ import { Estimate, Tycoon } from '../core/tycoon';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
-    expect(new Tycoon().transport()).toContain('No need to travel');
+    expect(new Tycoon().transport([])).toContain('No need to travel');
   });
 
   it("when remaining cargo is 'B', send cargo to warehouse B", () => {

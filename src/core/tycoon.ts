@@ -1,6 +1,8 @@
+type CargoDestination = 'B';
+
 export class Tycoon {
-  transport(p0?: string[]) {
-    if (p0) return ['Send cargo to warehouse B'];
+  transport(listOfDestinations: CargoDestination[]) {
+    if (listOfDestinations.length) return ['Send cargo to warehouse B'];
     return ['No need to travel'];
   }
 }
