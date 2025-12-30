@@ -39,6 +39,7 @@ describe('Tycoon', () => {
   it('After delivery to B, B is removed from the list', () => {
     expect(new Estimate().listAfterDelivery(['B', 'B'], [SENT_TO_B])).toEqual(['B']);
     expect(new Estimate().listAfterDelivery(['B'], [SENT_TO_B])).toEqual([]);
+    expect(new Estimate().listAfterDelivery(['B', 'B'], [SENT_TO_B, SENT_TO_B])).toEqual([]);
   });
 
   it('when there is no need to travel, arrival time is zero', () => {
