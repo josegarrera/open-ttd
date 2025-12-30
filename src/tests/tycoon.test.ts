@@ -100,4 +100,8 @@ describe('Tycoon', () => {
   it("when remaining cargo is 'PORT', send cargo to Port", () => {
     expect(new Tycoon().transport(['Port'])).toContainEqual(SENT_TO_PORT);
   });
+
+  it('if the distance from Factory to Port is 3, then the estimate is 3', () => {
+    expect(new Estimate(Infinity, 3).toArrival([SENT_TO_PORT])).toBe(3);
+  });
 });

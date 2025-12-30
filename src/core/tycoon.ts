@@ -1,8 +1,10 @@
-type CargoDestination = 'B' | 'Port';
+type CargoDestination = 'B' | 'Port' | 'A';
+type CargoStop = 'B' | 'Port' | 'A';
 
 interface DeliveryEvents {
   eq(e: DeliveryEvents): boolean;
   departure(): number;
+  nextStop(): CargoStop | null;
 }
 
 export class Done implements DeliveryEvents {
@@ -16,6 +18,10 @@ export class Done implements DeliveryEvents {
 
   departure() {
     return NaN;
+  }
+
+  nextStop() {
+    return null;
   }
 }
 
@@ -35,6 +41,10 @@ export class Sent implements DeliveryEvents {
 
   departure() {
     return this.sentAt;
+  }
+
+  nextStop() {
+    return this.destination;
   }
 }
 
@@ -61,11 +71,24 @@ export class Tycoon {
 }
 
 export class Estimate {
-  constructor(private distanceToB: number = 0) {}
+  constructor(
+    private distanceToB: number = 0,
+    private distanceToPort: number = 0
+  ) {}
   toArrival(p0: DeliveryEvents[]) {
-    let lastTime = Math.max(0, ...p0.map((e) => e.departure()).filter((t) => Number.isFinite(t)));
-    let delivery = p0.map((e) => e.departure()).filter((t) => Number.isFinite(t)).length ? this.distanceToB : 0;
-    return lastTime + delivery;
+    return Math.max(
+      0,
+      ...p0.map((e) => {
+        switch (e.nextStop()) {
+          case 'B':
+            return e.departure() + this.distanceToB;
+          case 'Port':
+            return e.departure() + this.distanceToPort;
+          default:
+            return 0;
+        }
+      })
+    );
   }
 
   listAfterDelivery(listOfDestinations: CargoDestination[], ev: DeliveryEvents[]) {
