@@ -33,7 +33,10 @@ export const SENT_TO_B = new Sent('B');
 export const DONE = new Done();
 
 export class Tycoon {
-  transport(listOfDestinations: CargoDestination[]) {
+  constructor(private nrOfTrucks: number = Infinity) {}
+
+  transport(listOfDestinations: CargoDestination[], pastEvents: DeliveryEvents[] = []) {
+    if (pastEvents.length >= this.nrOfTrucks) return [new Sent('B', 15)];
     if (listOfDestinations.length) return [SENT_TO_B];
     return [DONE];
   }

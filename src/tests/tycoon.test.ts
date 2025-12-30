@@ -30,8 +30,9 @@
       Why is it 10? Because the truck needs to return
     - Pickup time is important for the cargo
 
-> If we have 2 trucks, when all of them are busy, the next cargo gets picked up at the first
- available time. (Example: BBB)
+> When we have more cargos than trucks and the distance is non zero, cargo needs to wait
+> Waiting Cargo at the factory is picked up when the first truck returns from its destination.
+ (return = distance * 2)
 
  */
 
@@ -44,6 +45,11 @@ describe('Tycoon', () => {
 
   it("when remaining cargo is 'B', send cargo to warehouse B", () => {
     expect(new Tycoon().transport(['B'])).toContain(SENT_TO_B);
+  });
+
+  it('when we have more cargos than trucks and the distance is non zero, cargo needs to wait', () => {
+    const [, sentAt] = new Tycoon(2).transport(['B'], [SENT_TO_B, SENT_TO_B]).toString().split('@');
+    expect(Number(sentAt)).toBeGreaterThan(0);
   });
 
   it('After delivery to B, B is removed from the list', () => {
