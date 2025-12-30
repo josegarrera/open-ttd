@@ -3,3 +3,8 @@ export class Tycoon {
     return ['No need to travel'];
   }
 }
+export class Estimate {
+  toArrival() {
+    return 0;
+  }
+}
