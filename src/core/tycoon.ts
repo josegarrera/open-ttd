@@ -7,7 +7,8 @@ export class Tycoon {
   }
 }
 export class Estimate {
-  toArrival() {
+  toArrival(p0: string[]) {
+    if (p0.length && p0[0].includes('B')) return 0;
     return 0;
   }
 }

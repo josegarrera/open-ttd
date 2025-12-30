@@ -15,6 +15,7 @@
   - After delivery, _this cargo_ is removed from the list
 
 > When remaining cargo is 'B', send cargo to warehouse B.
+> If the distance from Factory to Warehouse B is 0, then the estimate is 0.
 > If the distance from Factory to Warehouse B is 5, then the estimate is 5.
 
  */
@@ -31,6 +32,10 @@ describe('Tycoon', () => {
   });
 
   it('when there is no need to travel, arrival time is zero', () => {
-    expect(new Estimate().toArrival()).toBe(0);
+    expect(new Estimate().toArrival([])).toBe(0);
+  });
+
+  it('if the distance from Factory to Warehouse B is 0, then the estimate is 0', () => {
+    expect(new Estimate().toArrival(['Send cargo to warehouse B'])).toBe(0);
   });
 });
