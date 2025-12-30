@@ -1,4 +1,4 @@
-type CargoDestination = 'B';
+type CargoDestination = 'B' | 'Port';
 
 interface DeliveryEvents {
   eq(e: DeliveryEvents): boolean;
@@ -39,6 +39,7 @@ export class Sent implements DeliveryEvents {
 }
 
 export const SENT_TO_B = new Sent('B');
+export const SENT_TO_PORT = new Sent('Port');
 export const DONE = new Done();
 
 export class Tycoon {
@@ -48,11 +49,9 @@ export class Tycoon {
   ) {}
 
   transport(listOfDestinations: CargoDestination[], pastEvents: DeliveryEvents[] = []) {
-    if (pastEvents.length >= this.nrOfTrucks) {
-      return [new Sent('B', this.nextAvailable(pastEvents))];
-    }
-    if (listOfDestinations.length) return [SENT_TO_B];
-    return [DONE];
+    if (!listOfDestinations.length) return [DONE];
+    const next = pastEvents.length >= this.nrOfTrucks ? this.nextAvailable(pastEvents) : 0;
+    return [new Sent(listOfDestinations.shift() as CargoDestination, next)];
   }
 
   private nextAvailable(evts: DeliveryEvents[]) {

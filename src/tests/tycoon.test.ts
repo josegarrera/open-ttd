@@ -47,9 +47,13 @@ Assuming distance to B is 5 and 2 trucks.
 
 > The estimate is the last cargo in the list + distance to b.
 
+### Conversation 5
+How do we go to the port? Assuming ['B', 'PORT']
+> Cargo with destination to PORT gets sent to Port when list is not empty
+> Destination to PORT is different from destination to B
  */
 
-import { DONE, Estimate, Sent, SENT_TO_B, Tycoon } from '../core/tycoon';
+import { DONE, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon } from '../core/tycoon';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -57,7 +61,7 @@ describe('Tycoon', () => {
   });
 
   it("when remaining cargo is 'B', send cargo to warehouse B", () => {
-    expect(new Tycoon().transport(['B'])).toContain(SENT_TO_B);
+    expect(new Tycoon().transport(['B'])).toContainEqual(SENT_TO_B);
   });
 
   it('when we have more cargos than trucks and the distance is non zero, cargo needs to wait', () => {
@@ -91,5 +95,9 @@ describe('Tycoon', () => {
     expect(new Estimate(100).toArrival([new Sent('B', 50)])).toBe(150);
     expect(new Estimate(100).toArrival([new Sent('B', 50), new Sent('B', 100)])).toBe(200);
     expect(new Estimate(100).toArrival([new Sent('B', 120), new Sent('B', 70)])).toBe(220);
+  });
+
+  it("when remaining cargo is 'PORT', send cargo to Port", () => {
+    expect(new Tycoon().transport(['Port'])).toContainEqual(SENT_TO_PORT);
   });
 });
