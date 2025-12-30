@@ -51,9 +51,19 @@ Assuming distance to B is 5 and 2 trucks.
 How do we go to the port? Assuming ['B', 'PORT']
 > Cargo with destination to PORT gets sent to Port when list is not empty
 > Destination to PORT is different from destination to B
+> Return time from PORT is different from return time from B
  */
 
-import { DONE, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon } from '../core/tycoon';
+import {
+  CargoDestination,
+  DeliveryEvents,
+  DONE,
+  Estimate,
+  Sent,
+  SENT_TO_B,
+  SENT_TO_PORT,
+  Tycoon,
+} from '../core/tycoon';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -103,5 +113,30 @@ describe('Tycoon', () => {
 
   it('if the distance from Factory to Port is 3, then the estimate is 3', () => {
     expect(new Estimate(Infinity, 3).toArrival([SENT_TO_PORT])).toBe(3);
+  });
+
+  it('return time from port is different from return time from B', () => {
+    const returnTimeFromB = 10;
+    const returnTimeFromPort = 2;
+    const sentToPortAt5 = new Sent('Port', 5);
+    const [, sentAt2] = new Tycoon(2, returnTimeFromB, returnTimeFromPort)
+      .transport(['B'], [sentToPortAt5, sentToPortAt5])
+      .toString()
+      .split('@');
+    expect(Number(sentAt2)).toBe(5 + returnTimeFromPort);
+  });
+
+  describe('Acceptance', () => {
+    it('Example: PortBB', () => {
+      const cargo: CargoDestination[] = ['Port', 'B', 'B'];
+      let events: DeliveryEvents[] = [];
+      const t = new Tycoon(2, 10, 2);
+      const e = new Estimate(5, 1);
+      for (const c of cargo) {
+        events.push(...t.transport([c], events));
+      }
+
+      expect(e.toArrival(events)).toBe(7);
+    });
   });
 });

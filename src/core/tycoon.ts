@@ -1,7 +1,7 @@
-type CargoDestination = 'B' | 'Port' | 'A';
+export type CargoDestination = 'B' | 'Port' | 'A';
 type CargoStop = 'B' | 'Port' | 'A';
 
-interface DeliveryEvents {
+export interface DeliveryEvents {
   eq(e: DeliveryEvents): boolean;
   departure(): number;
   nextStop(): CargoStop | null;
@@ -55,7 +55,8 @@ export const DONE = new Done();
 export class Tycoon {
   constructor(
     private nrOfTrucks: number = Infinity,
-    private returnTimeFromB = 15
+    private returnTimeFromB = 15,
+    private returnTimeFromPort = 20
   ) {}
 
   transport(listOfDestinations: CargoDestination[], pastEvents: DeliveryEvents[] = []) {
@@ -66,7 +67,18 @@ export class Tycoon {
 
   private nextAvailable(evts: DeliveryEvents[]) {
     const [b1, b2] = evts.slice(-2);
-    return Math.min(b1.departure(), b2.departure()) + this.returnTimeFromB;
+    return Math.min(this.returnTime(b1), this.returnTime(b2));
+  }
+
+  private returnTime(e: DeliveryEvents) {
+    switch (e.nextStop()) {
+      case 'Port':
+        return e.departure() + this.returnTimeFromPort;
+      case 'B':
+        return e.departure() + this.returnTimeFromB;
+      default:
+        return 0;
+    }
   }
 }
 
