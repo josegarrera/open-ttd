@@ -1,12 +1,17 @@
 type CargoDestination = 'B';
 
+export const SENT_TO_B = 'Sent cargo to warehouse B';
+export const DONE = 'Work finished';
+
 export class Tycoon {
   transport(listOfDestinations: CargoDestination[]) {
-    if (listOfDestinations.length) return ['Sent cargo to warehouse B'];
-    return ['Work finished'];
+    if (listOfDestinations.length) return [SENT_TO_B];
+    return [DONE];
   }
 }
+
 type DeliveryEvents = string;
+
 export class Estimate {
   constructor(private distanceToB: number = 0) {}
   toArrival(p0: DeliveryEvents[]) {
