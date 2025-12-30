@@ -2,6 +2,7 @@ type CargoDestination = 'B';
 
 interface DeliveryEvents {
   eq(e: DeliveryEvents): boolean;
+  nextAvailable(roundTrip: number): number;
 }
 
 export class Done implements DeliveryEvents {
@@ -11,6 +12,10 @@ export class Done implements DeliveryEvents {
 
   eq(e: DeliveryEvents) {
     return this.toString() === e.toString();
+  }
+
+  nextAvailable(roundTrip: number) {
+    return 0 + roundTrip;
   }
 }
 
@@ -27,16 +32,26 @@ export class Sent implements DeliveryEvents {
   eq(e: DeliveryEvents) {
     return this.toString() === e.toString();
   }
+
+  nextAvailable(roundTrip: number) {
+    return this.sentAt + roundTrip;
+  }
 }
 
 export const SENT_TO_B = new Sent('B');
 export const DONE = new Done();
 
 export class Tycoon {
-  constructor(private nrOfTrucks: number = Infinity) {}
+  constructor(
+    private nrOfTrucks: number = Infinity,
+    private returnTimeFromB = 15
+  ) {}
 
   transport(listOfDestinations: CargoDestination[], pastEvents: DeliveryEvents[] = []) {
-    if (pastEvents.length >= this.nrOfTrucks) return [new Sent('B', 15)];
+    if (pastEvents.length >= this.nrOfTrucks) {
+      const [b1, b2] = pastEvents.slice(-2);
+      return [new Sent('B', Math.min(b1.nextAvailable(this.returnTimeFromB), b2.nextAvailable(this.returnTimeFromB)))];
+    }
     if (listOfDestinations.length) return [SENT_TO_B];
     return [DONE];
   }

@@ -29,14 +29,18 @@
       - BBB: [SENT_TO_B@0, SENT_TO_B@0, SENT_TO_B@10], assuming Distance to WH b = 5
       Why is it 10? Because the truck needs to return
     - Pickup time is important for the cargo
+  - The return time is relative to the availability of the trucks
+    - What does this mean?
+      - It means we need to pick a truck, and calculate when it returns based on its _last_ sentAt.
 
 > When we have more cargos than trucks and the distance is non zero, cargo needs to wait
+> When all trucks are busy, the next truck returns at <last sentAt> + returnTime
 > Waiting Cargo at the factory is picked up when the first truck returns from its destination.
- (return = distance * 2)
+ (return = distance * 2) From the departure of the earlier truck
 
  */
 
-import { DONE, Estimate, SENT_TO_B, Tycoon } from '../core/tycoon';
+import { DONE, Estimate, Sent, SENT_TO_B, Tycoon } from '../core/tycoon';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -48,8 +52,16 @@ describe('Tycoon', () => {
   });
 
   it('when we have more cargos than trucks and the distance is non zero, cargo needs to wait', () => {
-    const [, sentAt] = new Tycoon(2).transport(['B'], [SENT_TO_B, SENT_TO_B]).toString().split('@');
+    const [, sentAt] = new Tycoon(2, 15).transport(['B'], [SENT_TO_B, SENT_TO_B]).toString().split('@');
     expect(Number(sentAt)).toBeGreaterThan(0);
+  });
+
+  it('When all trucks are busy, the next truck returns at last sentAt + returnTime', () => {
+    const returnTime = 15;
+    const lastSent10 = 10;
+    const sentToBAt10 = new Sent('B', lastSent10);
+    const [, sentAt2] = new Tycoon(2, returnTime).transport(['B'], [sentToBAt10, sentToBAt10]).toString().split('@');
+    expect(Number(sentAt2)).toBe(lastSent10 + returnTime);
   });
 
   it('After delivery to B, B is removed from the list', () => {
