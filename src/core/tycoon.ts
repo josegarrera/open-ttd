@@ -64,8 +64,9 @@ export class Tycoon {
 export class Estimate {
   constructor(private distanceToB: number = 0) {}
   toArrival(p0: DeliveryEvents[]) {
-    if (p0.length && p0[0].eq(SENT_TO_B)) return this.distanceToB;
-    return 0;
+    let lastTime = Math.max(0, ...p0.map((e) => e.departure()).filter((t) => Number.isFinite(t)));
+    let delivery = p0.map((e) => e.departure()).filter((t) => Number.isFinite(t)).length ? this.distanceToB : 0;
+    return lastTime + delivery;
   }
 
   listAfterDelivery(listOfDestinations: CargoDestination[], ev: DeliveryEvents[]) {

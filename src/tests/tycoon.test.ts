@@ -38,6 +38,15 @@
 > Waiting Cargo at the factory is picked up when the first truck returns from its destination.
  (return = distance * 2) From the departure of the earlier truck
 
+## Conversation 4
+Assuming distance to B is 5 and 2 trucks.
+- BBB Estimate needs to be 15.
+  - Why?
+    - 2 pickups at 0, B1 delivered at 5, B2 delivered at 5
+    - 3rd pickup at 10, B3 delivered at 15.
+
+> The estimate is the last cargo in the list + distance to b.
+
  */
 
 import { DONE, Estimate, Sent, SENT_TO_B, Tycoon } from '../core/tycoon';
@@ -71,10 +80,16 @@ describe('Tycoon', () => {
   });
 
   it('when there is no need to travel, arrival time is zero', () => {
-    expect(new Estimate().toArrival([DONE])).toBe(0);
+    expect(new Estimate(5).toArrival([DONE])).toBe(0);
   });
 
   it('if the distance from Factory to Warehouse B is 1, then the estimate is 1', () => {
     expect(new Estimate(1).toArrival([SENT_TO_B])).toBe(1);
+  });
+
+  it('the estimate is the latest (cargo in the list sentAt + distance to b)', () => {
+    expect(new Estimate(100).toArrival([new Sent('B', 50)])).toBe(150);
+    expect(new Estimate(100).toArrival([new Sent('B', 50), new Sent('B', 100)])).toBe(200);
+    expect(new Estimate(100).toArrival([new Sent('B', 120), new Sent('B', 70)])).toBe(220);
   });
 });
