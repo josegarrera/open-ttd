@@ -22,6 +22,16 @@
 ## Conversation 3
 - Two cargos to destination: Warehouse B (['B', 'B'])
   - Because the list is not empty
+  - There are two trucks. What does that mean?
+    - We can send two cargos at the same time.
+    - Example: BB vs. BBB
+      - BB: [SENT_TO_B@0, SENT_TO_B@0]
+      - BBB: [SENT_TO_B@0, SENT_TO_B@0, SENT_TO_B@10], assuming Distance to WH b = 5
+      Why is it 10? Because the truck needs to return
+    - Pickup time is important for the cargo
+
+> If we have 2 trucks, when all of them are busy, the next cargo gets picked up at the first
+ available time. (Example: BBB)
 
  */
 

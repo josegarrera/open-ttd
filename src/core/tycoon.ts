@@ -1,7 +1,36 @@
 type CargoDestination = 'B';
 
-export const SENT_TO_B = 'Sent cargo to warehouse B';
-export const DONE = 'Work finished';
+interface DeliveryEvents {
+  eq(e: DeliveryEvents): boolean;
+}
+
+export class Done implements DeliveryEvents {
+  toString() {
+    return `Work finished`;
+  }
+
+  eq(e: DeliveryEvents) {
+    return this.toString() === e.toString();
+  }
+}
+
+export class Sent implements DeliveryEvents {
+  constructor(
+    private destination: CargoDestination,
+    private sentAt: number = 0
+  ) {}
+
+  toString() {
+    return `Sent cargo to warehouse ${this.destination}@${this.sentAt}`;
+  }
+
+  eq(e: DeliveryEvents) {
+    return this.toString() === e.toString();
+  }
+}
+
+export const SENT_TO_B = new Sent('B');
+export const DONE = new Done();
 
 export class Tycoon {
   transport(listOfDestinations: CargoDestination[]) {
@@ -10,12 +39,10 @@ export class Tycoon {
   }
 }
 
-type DeliveryEvents = string;
-
 export class Estimate {
   constructor(private distanceToB: number = 0) {}
   toArrival(p0: DeliveryEvents[]) {
-    if (p0.length && p0[0].includes('B')) return this.distanceToB;
+    if (p0.length && p0[0].eq(SENT_TO_B)) return this.distanceToB;
     return 0;
   }
 
