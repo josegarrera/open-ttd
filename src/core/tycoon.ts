@@ -61,8 +61,8 @@ export class Tycoon {
 
   transport(listOfDestinations: CargoDestination[], pastEvents: DeliveryEvents[] = []) {
     if (!listOfDestinations.length) return [DONE];
-    const next = pastEvents.length >= this.nrOfTrucks ? this.nextAvailable(pastEvents) : 0;
-    return [new Sent(listOfDestinations.shift() as CargoDestination, next)];
+    const departureTime = pastEvents.length >= this.nrOfTrucks ? this.nextAvailable(pastEvents) : 0;
+    return [new Sent(listOfDestinations.shift() as CargoDestination, departureTime)];
   }
 
   private nextAvailable(evts: DeliveryEvents[]) {
