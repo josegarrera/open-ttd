@@ -2,12 +2,17 @@ export type CargoDestination = 'B' | 'Port' | 'A';
 
 export class Sent {
   constructor(
-    public readonly destination: CargoDestination,
-    public readonly sentAt: number = 0
+    private readonly destination: CargoDestination,
+    private readonly sentAt: number = 0,
+    private readonly travelTime: number = 0
   ) {}
 
-  returnTime(returnTime: number) {
-    return this.sentAt + returnTime;
+  returnTime() {
+    return this.arrivalTime() + this.travelTime;
+  }
+
+  arrivalTime() {
+    return this.sentAt + this.travelTime;
   }
 
   toString() {
@@ -15,8 +20,8 @@ export class Sent {
   }
 }
 
-export const SENT_TO_B = new Sent('B');
-export const SENT_TO_PORT = new Sent('Port');
+export const SENT_TO_B = new Sent('B', 0, 1);
+export const SENT_TO_PORT = new Sent('Port', 0, 3);
 
 export class Tycoon {
   constructor(
@@ -28,49 +33,29 @@ export class Tycoon {
   transport(listOfDestinations: CargoDestination[], pastEvents: Sent[] = []) {
     if (!listOfDestinations.length) return [];
     const departureTime = pastEvents.length >= this.nrOfTrucks ? this.nextAvailable(pastEvents) : 0;
-    return [new Sent(listOfDestinations.shift() as CargoDestination, departureTime)];
+    const destination = listOfDestinations.shift() as CargoDestination;
+    let travelTime = 0;
+    switch (destination) {
+      case 'Port':
+        travelTime = this.returnTimeFromPort / 2;
+        break;
+      case 'B':
+        travelTime = this.returnTimeFromB / 2;
+        break;
+    }
+    return [new Sent(destination, departureTime, travelTime)];
   }
 
   private nextAvailable(evts: Sent[]) {
     const [b1, b2] = evts.slice(-2);
-    return Math.min(this.returnTime(b1), this.returnTime(b2));
-  }
-
-  returnTime(e: Sent) {
-    let travelTime = 0;
-    switch (e.destination) {
-      case 'Port':
-        travelTime = this.returnTimeFromPort;
-        break;
-      case 'B':
-        travelTime = this.returnTimeFromB;
-        break;
-    }
-    return e.returnTime(travelTime);
+    return Math.min(b1.returnTime(), b2.returnTime());
   }
 }
 
 export class Estimate {
-  constructor(
-    private distanceToB: number = 0,
-    private distanceToPort: number = 0
-  ) {}
+  constructor() {}
   toArrival(p0: Sent[]) {
-    return Math.max(
-      0,
-      ...p0.map((e) => {
-        let travelTime = 0;
-        switch (e.destination) {
-          case 'Port':
-            travelTime = this.distanceToPort;
-            break;
-          case 'B':
-            travelTime = this.distanceToB;
-            break;
-        }
-        return e.returnTime(travelTime);
-      })
-    );
+    return Math.max(0, ...p0.map((e) => e.arrivalTime()));
   }
 
   listAfterDelivery(listOfDestinations: CargoDestination[], ev: Sent[]) {

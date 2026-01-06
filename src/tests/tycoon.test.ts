@@ -62,7 +62,7 @@ describe('Tycoon', () => {
   });
 
   it("when remaining cargo is 'B', send cargo to warehouse B", () => {
-    expect(new Tycoon().transport(['B'])).toContainEqual(SENT_TO_B);
+    expect(new Tycoon(Infinity, 2).transport(['B'])).toContainEqual(SENT_TO_B);
   });
 
   it('when we have more cargos than trucks and the distance is non zero, cargo needs to wait', () => {
@@ -73,7 +73,7 @@ describe('Tycoon', () => {
   it('When all trucks are busy, the next truck returns at last sentAt + returnTime', () => {
     const returnTime = 15;
     const lastSent10 = 10;
-    const sentToBAt10 = new Sent('B', lastSent10);
+    const sentToBAt10 = new Sent('B', lastSent10, 7.5);
     const [, sentAt2] = new Tycoon(2, returnTime).transport(['B'], [sentToBAt10, sentToBAt10]).toString().split('@');
     expect(Number(sentAt2)).toBe(lastSent10 + returnTime);
   });
@@ -85,31 +85,31 @@ describe('Tycoon', () => {
   });
 
   it('when there is no need to travel, arrival time is zero', () => {
-    expect(new Estimate(5).toArrival([])).toBe(0);
+    expect(new Estimate().toArrival([])).toBe(0);
   });
 
   it('if the distance from Factory to Warehouse B is 1, then the estimate is 1', () => {
-    expect(new Estimate(1).toArrival([SENT_TO_B])).toBe(1);
+    expect(new Estimate().toArrival([SENT_TO_B])).toBe(1);
   });
 
   it('the estimate is the latest (cargo in the list sentAt + distance to b)', () => {
-    expect(new Estimate(100).toArrival([new Sent('B', 50)])).toBe(150);
-    expect(new Estimate(100).toArrival([new Sent('B', 50), new Sent('B', 100)])).toBe(200);
-    expect(new Estimate(100).toArrival([new Sent('B', 120), new Sent('B', 70)])).toBe(220);
+    expect(new Estimate().toArrival([new Sent('B', 50, 100)])).toBe(150);
+    expect(new Estimate().toArrival([new Sent('B', 50, 100), new Sent('B', 100, 100)])).toBe(200);
+    expect(new Estimate().toArrival([new Sent('B', 120, 100), new Sent('B', 70, 100)])).toBe(220);
   });
 
   it("when remaining cargo is 'PORT', send cargo to Port", () => {
-    expect(new Tycoon().transport(['Port'])).toContainEqual(SENT_TO_PORT);
+    expect(new Tycoon(Infinity, NaN, 6).transport(['Port'])).toContainEqual(SENT_TO_PORT);
   });
 
   it('if the distance from Factory to Port is 3, then the estimate is 3', () => {
-    expect(new Estimate(Infinity, 3).toArrival([SENT_TO_PORT])).toBe(3);
+    expect(new Estimate().toArrival([SENT_TO_PORT])).toBe(3);
   });
 
   it('return time from port is different from return time from B', () => {
     const returnTimeFromB = 10;
     const returnTimeFromPort = 2;
-    const sentToPortAt5 = new Sent('Port', 5);
+    const sentToPortAt5 = new Sent('Port', 5, 1);
     const [, sentAt2] = new Tycoon(2, returnTimeFromB, returnTimeFromPort)
       .transport(['B'], [sentToPortAt5, sentToPortAt5])
       .toString()
@@ -122,7 +122,7 @@ describe('Tycoon', () => {
       const cargo: CargoDestination[] = ['Port', 'B', 'B'];
       let events: Sent[] = [];
       const t = new Tycoon(2, 10, 2);
-      const e = new Estimate(5, 1);
+      const e = new Estimate();
       for (const c of cargo) {
         events.push(...t.transport([c], events));
       }
