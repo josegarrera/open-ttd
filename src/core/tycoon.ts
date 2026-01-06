@@ -6,6 +6,10 @@ export class Sent {
     public readonly sentAt: number = 0
   ) {}
 
+  returnTime(returnTime: number) {
+    return this.sentAt + returnTime;
+  }
+
   toString() {
     return `Sent cargo to warehouse ${this.destination}@${this.sentAt}`;
   }
@@ -32,15 +36,17 @@ export class Tycoon {
     return Math.min(this.returnTime(b1), this.returnTime(b2));
   }
 
-  private returnTime(e: Sent) {
+  returnTime(e: Sent) {
+    let travelTime = 0;
     switch (e.destination) {
       case 'Port':
-        return e.sentAt + this.returnTimeFromPort;
+        travelTime = this.returnTimeFromPort;
+        break;
       case 'B':
-        return e.sentAt + this.returnTimeFromB;
-      default:
-        return 0;
+        travelTime = this.returnTimeFromB;
+        break;
     }
+    return e.returnTime(travelTime);
   }
 }
 
@@ -53,14 +59,16 @@ export class Estimate {
     return Math.max(
       0,
       ...p0.map((e) => {
+        let travelTime = 0;
         switch (e.destination) {
           case 'Port':
-            return e.sentAt + this.distanceToPort;
+            travelTime = this.distanceToPort;
+            break;
           case 'B':
-            return e.sentAt + this.distanceToB;
-          default:
-            return 0;
+            travelTime = this.distanceToB;
+            break;
         }
+        return e.returnTime(travelTime);
       })
     );
   }
