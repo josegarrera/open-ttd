@@ -2,24 +2,12 @@ export type CargoDestination = 'B' | 'Port' | 'A';
 
 export class Sent {
   constructor(
-    private destination: CargoDestination,
-    private sentAt: number = 0
+    public readonly destination: CargoDestination,
+    public readonly sentAt: number = 0
   ) {}
 
   toString() {
     return `Sent cargo to warehouse ${this.destination}@${this.sentAt}`;
-  }
-
-  eq(e: Sent) {
-    return this.toString() === e.toString();
-  }
-
-  departure() {
-    return this.sentAt;
-  }
-
-  nextStop() {
-    return this.destination;
   }
 }
 
@@ -45,11 +33,11 @@ export class Tycoon {
   }
 
   private returnTime(e: Sent) {
-    switch (e.nextStop()) {
+    switch (e.destination) {
       case 'Port':
-        return e.departure() + this.returnTimeFromPort;
+        return e.sentAt + this.returnTimeFromPort;
       case 'B':
-        return e.departure() + this.returnTimeFromB;
+        return e.sentAt + this.returnTimeFromB;
       default:
         return 0;
     }
@@ -65,13 +53,11 @@ export class Estimate {
     return Math.max(
       0,
       ...p0.map((e) => {
-        switch (e.nextStop()) {
-          case 'B':
-            return e.departure() + this.distanceToB;
+        switch (e.destination) {
           case 'Port':
-            return e.departure() + this.distanceToPort;
-          case 'A':
-            return e.departure() + 0;
+            return e.sentAt + this.distanceToPort;
+          case 'B':
+            return e.sentAt + this.distanceToB;
           default:
             return 0;
         }
