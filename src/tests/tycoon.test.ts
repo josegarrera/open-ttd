@@ -54,20 +54,11 @@ How do we go to the port? Assuming ['B', 'PORT']
 > Return time from PORT is different from return time from B
  */
 
-import {
-  CargoDestination,
-  DeliveryEvents,
-  DONE,
-  Estimate,
-  Sent,
-  SENT_TO_B,
-  SENT_TO_PORT,
-  Tycoon,
-} from '../core/tycoon';
+import { CargoDestination, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon } from '../core/tycoon';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
-    expect(new Tycoon().transport([])).toContain(DONE);
+    expect(new Tycoon().transport([])).toHaveLength(0);
   });
 
   it("when remaining cargo is 'B', send cargo to warehouse B", () => {
@@ -94,7 +85,7 @@ describe('Tycoon', () => {
   });
 
   it('when there is no need to travel, arrival time is zero', () => {
-    expect(new Estimate(5).toArrival([DONE])).toBe(0);
+    expect(new Estimate(5).toArrival([])).toBe(0);
   });
 
   it('if the distance from Factory to Warehouse B is 1, then the estimate is 1', () => {
@@ -129,7 +120,7 @@ describe('Tycoon', () => {
   describe('Acceptance', () => {
     it('Example: PortBB', () => {
       const cargo: CargoDestination[] = ['Port', 'B', 'B'];
-      let events: DeliveryEvents[] = [];
+      let events: Sent[] = [];
       const t = new Tycoon(2, 10, 2);
       const e = new Estimate(5, 1);
       for (const c of cargo) {
