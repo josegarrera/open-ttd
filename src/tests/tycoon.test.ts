@@ -171,8 +171,17 @@ describe('Tycoon', () => {
       it('arrival time at B', () => {
         expect(bArrival(cargo)).toMatchObject([7, 9, 17, 21]);
       });
-      // expect(portArrival(cargo)).toBe([1, 1, 3, 15]);
-      // expect(bArrival(cargo)).toBe([7, 9, 17, 21])
+      it('arrival time at A', () => {
+        /*
+        ship
+        0 --> [1, 1, 3, 15]
+        9 --> [1, 3, 15]
+        17 --> [3, 15]
+        25 --> [15]
+        33 --> []
+         */
+        expect(aArrival(portArrival(cargo))).toMatchObject([5, 13, 21, 29]);
+      });
     });
   });
 });

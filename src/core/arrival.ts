@@ -24,7 +24,12 @@ export function portArrival(cargo: CargoDestination[]) {
 }
 
 export function aArrival(portArrival: number[]) {
-  return portArrival;
+  let shipAvailability = 0;
+  return portArrival.map((arrival) => {
+    const deliveredAt = Math.max(shipAvailability, arrival) + 4;
+    shipAvailability = deliveredAt + 4;
+    return deliveredAt;
+  });
 }
 
 export function bArrival(cargo: CargoDestination[]) {
