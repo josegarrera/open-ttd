@@ -165,7 +165,10 @@ describe('Tycoon', () => {
         ]);
         expect(truckAvailability([22, 26], [])).toMatchObject([[22, 26], []]);
       });
-      // expect(portArrival(cargo)).toBe([1, 1, 3, 13]);
+      it('arrival time at Port', () => {
+        expect(portArrival(cargo)).toMatchObject([1, 1, 3, 15]);
+      });
+      // expect(portArrival(cargo)).toBe([1, 1, 3, 15]);
       // expect(bArrival(cargo)).toBe([7, 9, 17, 21])
     });
   });
