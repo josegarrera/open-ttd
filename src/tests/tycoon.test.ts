@@ -55,6 +55,7 @@ How do we go to the port? Assuming ['B', 'PORT']
  */
 
 import { CargoDestination, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon } from '../core/tycoon';
+import { aArrival, bArrival, portArrival, truckAvailability } from '../core/arrival';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -149,7 +150,7 @@ describe('Tycoon', () => {
         expect(aArrival(portArrival(cargo))).toHaveLength(4);
         expect(bArrival(cargo)).toHaveLength(4);
       });
-      it('', () => {
+      it('truck availability updates with each delivery depending on  destination', () => {
         expect(truckAvailability([0, 0], ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
           [2, 0],
           ['A', 'B', 'A', 'B', 'B', 'A', 'B'],
@@ -168,24 +169,3 @@ describe('Tycoon', () => {
     });
   });
 });
-
-function truckAvailability(availability: [number, number], cargo: CargoDestination[]) {
-  const [t1, t2] = availability;
-  let updatedAvailability: [number, number];
-  const returnTime = cargo[0] === 'A' ? 2 : 10;
-  if (t1 <= t2) updatedAvailability = [t1 + returnTime, t2];
-  else updatedAvailability = [t1, t2 + returnTime];
-  return [updatedAvailability, cargo.slice(1)];
-}
-
-function portArrival(cargo: CargoDestination[]) {
-  return cargo.filter((c) => c === 'A');
-}
-
-function aArrival(portArrival: CargoDestination[]) {
-  return portArrival;
-}
-
-function bArrival(cargo: CargoDestination[]) {
-  return cargo.filter((c) => c === 'B');
-}
