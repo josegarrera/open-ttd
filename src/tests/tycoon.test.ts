@@ -168,6 +168,9 @@ describe('Tycoon', () => {
       it('arrival time at Port', () => {
         expect(portArrival(cargo)).toMatchObject([1, 1, 3, 15]);
       });
+      it('arrival time at B', () => {
+        expect(bArrival(cargo)).toMatchObject([7, 9, 17, 21]);
+      });
       // expect(portArrival(cargo)).toBe([1, 1, 3, 15]);
       // expect(bArrival(cargo)).toBe([7, 9, 17, 21])
     });

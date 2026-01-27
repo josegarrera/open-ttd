@@ -28,5 +28,11 @@ export function aArrival(portArrival: number[]) {
 }
 
 export function bArrival(cargo: CargoDestination[]) {
-  return cargo.filter((c) => c === 'B');
+  let currentAvailability: [number, number] = [0, 0];
+  const arrivalTimes = [];
+  for (let i = 0; i < cargo.length; i++) {
+    if (cargo.slice(i)[0] === 'B') arrivalTimes.push(Math.min(...currentAvailability) + 5);
+    [currentAvailability] = truckAvailability(currentAvailability, cargo.slice(i));
+  }
+  return arrivalTimes;
 }
