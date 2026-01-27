@@ -1,6 +1,7 @@
 import type { CargoDestination } from './tycoon';
 
 export function truckAvailability(availability: [number, number], cargo: CargoDestination[]) {
+  if (cargo.length === 0) return [availability, cargo];
   const [t1, t2] = availability;
   let updatedAvailability: [number, number];
   const returnTime = cargo[0] === 'A' ? 2 : 10;
