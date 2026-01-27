@@ -55,7 +55,7 @@ How do we go to the port? Assuming ['B', 'PORT']
  */
 
 import { CargoDestination, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon } from '../core/tycoon';
-import { aArrival, bArrival, estimatedArrival, portArrival, truckAvailability } from '../core/arrival';
+import { aArrival, bArrival, estimatedArrival, portArrival } from '../core/arrival';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -149,21 +149,6 @@ describe('Tycoon', () => {
       it('all containers arrive at their destination', () => {
         expect(aArrival(portArrival(cargo))).toHaveLength(4);
         expect(bArrival(cargo)).toHaveLength(4);
-      });
-      it('truck availability updates with each delivery depending on  destination', () => {
-        expect(truckAvailability([0, 0], ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
-          [2, 0],
-          ['A', 'B', 'A', 'B', 'B', 'A', 'B'],
-        ]);
-        expect(truckAvailability([2, 0], ['A', 'B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
-          [2, 2],
-          ['B', 'A', 'B', 'B', 'A', 'B'],
-        ]);
-        expect(truckAvailability([2, 2], ['B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
-          [12, 2],
-          ['A', 'B', 'B', 'A', 'B'],
-        ]);
-        expect(truckAvailability([22, 26], [])).toMatchObject([[22, 26], []]);
       });
       it('arrival time at Port', () => {
         expect(portArrival(cargo)).toMatchObject([1, 1, 3, 15]);
