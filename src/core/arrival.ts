@@ -1,4 +1,4 @@
-import type { CargoDestination } from './tycoon';
+import { CargoDestination } from './tycoon';
 
 export function truckAvailability(
   availability: [number, number],
@@ -40,4 +40,8 @@ export function bArrival(cargo: CargoDestination[]) {
     [currentAvailability] = truckAvailability(currentAvailability, cargo.slice(i));
   }
   return arrivalTimes;
+}
+
+export function estimatedArrival(cargo: CargoDestination[]) {
+  return Math.max(...aArrival(portArrival(cargo)), ...bArrival(cargo));
 }
