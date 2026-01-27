@@ -129,5 +129,63 @@ describe('Tycoon', () => {
 
       expect(e.toArrival(events)).toBe(7);
     });
+
+    describe('Example: AABABBAB', () => {
+      const cargo: CargoDestination[] = ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B'];
+      /*
+      Only land
+      arrival times to Port and to B
+      (0, 0) --> ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B']
+      (2, 0) --> ['A', 'B', 'A', 'B', 'B', 'A', 'B']
+      (2, 2) --> ['B', 'A', 'B', 'B', 'A', 'B']
+      (12, 2) --> ['A', 'B', 'B', 'A', 'B']
+      (12, 4) --> ['B', 'B', 'A', 'B']
+      (12, 14) --> ['B', 'A', 'B']
+      (22, 14) --> ['A', 'B']
+      (22, 16) --> ['B']
+      (22, 26) --> []
+       */
+      it('all containers arrive at their destination', () => {
+        expect(aArrival(portArrival(cargo))).toHaveLength(4);
+        expect(bArrival(cargo)).toHaveLength(4);
+      });
+      it('', () => {
+        expect(truckAvailability([0, 0], ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
+          [2, 0],
+          ['A', 'B', 'A', 'B', 'B', 'A', 'B'],
+        ]);
+        expect(truckAvailability([2, 0], ['A', 'B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
+          [2, 2],
+          ['B', 'A', 'B', 'B', 'A', 'B'],
+        ]);
+        expect(truckAvailability([2, 2], ['B', 'A', 'B', 'B', 'A', 'B'])).toMatchObject([
+          [12, 2],
+          ['A', 'B', 'B', 'A', 'B'],
+        ]);
+      });
+      // expect(portArrival(cargo)).toBe([1, 1, 3, 13]);
+      // expect(bArrival(cargo)).toBe([7, 9, 17, 21])
+    });
   });
 });
+
+function truckAvailability(availability: [number, number], cargo: CargoDestination[]) {
+  const [t1, t2] = availability;
+  let updatedAvailability: [number, number];
+  const returnTime = cargo[0] === 'A' ? 2 : 10;
+  if (t1 <= t2) updatedAvailability = [t1 + returnTime, t2];
+  else updatedAvailability = [t1, t2 + returnTime];
+  return [updatedAvailability, cargo.slice(1)];
+}
+
+function portArrival(cargo: CargoDestination[]) {
+  return cargo.filter((c) => c === 'A');
+}
+
+function aArrival(portArrival: CargoDestination[]) {
+  return portArrival;
+}
+
+function bArrival(cargo: CargoDestination[]) {
+  return cargo.filter((c) => c === 'B');
+}
