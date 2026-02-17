@@ -2,11 +2,13 @@ import { CargoDestination } from './tycoon';
 
 const A = 'A';
 const B = 'B';
+const distanceToPort = 1;
+const distanceToB = 5;
 
 export function estimatedArrival(cargo: CargoDestination[]) {
   return Math.max(
-    ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, A, 1))),
-    ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, B, 5))
+    ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, A, distanceToPort))),
+    ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, B, distanceToB))
   );
 }
 
