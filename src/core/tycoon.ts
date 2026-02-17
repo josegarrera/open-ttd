@@ -1,8 +1,9 @@
-export type CargoDestination = 'B' | 'Port' | 'A';
+export type Location = 'B' | 'Port' | 'A';
+export type Destination = 'A' | 'B';
 
 export class Sent {
   constructor(
-    private readonly destination: CargoDestination,
+    private readonly destination: Location,
     private readonly sentAt: number = 0,
     private readonly travelTime: number = 0
   ) {}
@@ -30,10 +31,10 @@ export class Tycoon {
     private returnTimeFromPort = 20
   ) {}
 
-  transport(listOfDestinations: CargoDestination[], pastEvents: Sent[] = []) {
+  transport(listOfDestinations: Location[], pastEvents: Sent[] = []) {
     if (!listOfDestinations.length) return [];
     const departureTime = pastEvents.length >= this.nrOfTrucks ? this.nextAvailable(pastEvents) : 0;
-    const destination = listOfDestinations.shift() as CargoDestination;
+    const destination = listOfDestinations.shift() as Location;
     let travelTime = 0;
     switch (destination) {
       case 'Port':
@@ -58,7 +59,7 @@ export class Estimate {
     return Math.max(0, ...p0.map((e) => e.arrivalTime()));
   }
 
-  listAfterDelivery(listOfDestinations: CargoDestination[], ev: Sent[]) {
+  listAfterDelivery(listOfDestinations: Location[], ev: Sent[]) {
     return listOfDestinations.slice(ev.length);
   }
 }

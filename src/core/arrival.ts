@@ -1,4 +1,4 @@
-import { CargoDestination } from './tycoon';
+import { Location, Destination } from './tycoon';
 
 const A = 'A';
 const B = 'B';
@@ -20,7 +20,7 @@ const Bplus: LocationInfo = {
   distance: distanceToB,
 };
 
-export function estimatedArrival(cargo: CargoDestination[]) {
+export function estimatedArrival(cargo: Destination[]) {
   return Math.max(
     ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Aplus))),
     ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Bplus))
@@ -28,7 +28,7 @@ export function estimatedArrival(cargo: CargoDestination[]) {
 }
 
 function calculateArrivalTime(
-  cargo: CargoDestination,
+  cargo: Location,
   now: number,
   { label: destination, distance: travelTime }: LocationInfo
 ): [number] | [] {
@@ -39,21 +39,30 @@ function calculateArrivalTime(
   }
 }
 
-function arrivals(cargo: CargoDestination[], getTime: (cargo: CargoDestination, available: number) => [number] | []) {
+function getReturnTime(c: 'B' | 'Port' | 'A') {
+  const locationsTable = {
+    [Aplus.label]: Aplus.distance * 2,
+    [Bplus.label]: Bplus.distance * 2,
+  };
+  return locationsTable[c];
+}
+
+function arrivals(cargo: Destination[], getTime: (cargo: Location, available: number) => [number] | []) {
   let availability: [number, number] = [0, 0];
 
   return cargo.flatMap((c) => {
     const time = getTime(c, Math.min(...availability));
-    [availability] = truckAvailability(availability, c === 'A' ? 2 : 10);
+    const returnTime = getReturnTime(c);
+    [availability] = truckAvailability(availability, returnTime);
     return time;
   });
 }
 
-export function portArrival(cargo: CargoDestination[]) {
+export function portArrival(cargo: Destination[]) {
   return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Aplus));
 }
 
-export function bArrival(cargo: CargoDestination[]) {
+export function bArrival(cargo: Destination[]) {
   return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Bplus));
 }
 

@@ -54,7 +54,7 @@ How do we go to the port? Assuming ['B', 'PORT']
 > Return time from PORT is different from return time from B
  */
 
-import { CargoDestination, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon } from '../core/tycoon';
+import { Location, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon, Destination } from '../core/tycoon';
 import { aArrival, bArrival, estimatedArrival, portArrival } from '../core/arrival';
 
 describe('Tycoon', () => {
@@ -120,7 +120,7 @@ describe('Tycoon', () => {
 
   describe('Acceptance', () => {
     it('Example: PortBB', () => {
-      const cargo: CargoDestination[] = ['Port', 'B', 'B'];
+      const cargo: Location[] = ['Port', 'B', 'B'];
       let events: Sent[] = [];
       const t = new Tycoon(2, 10, 2);
       const e = new Estimate();
@@ -132,7 +132,7 @@ describe('Tycoon', () => {
     });
 
     describe('Example: AABABBAB', () => {
-      const cargo: CargoDestination[] = ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B'];
+      const cargo: Destination[] = ['A', 'A', 'B', 'A', 'B', 'B', 'A', 'B'];
       /*
       Only land
       arrival times to Port and to B
