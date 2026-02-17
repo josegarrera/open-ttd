@@ -59,9 +59,11 @@ function getReturnTime(c: Location) {
   return locationsTable[c];
 }
 
-function arrivals(cargo: Destination[], getTime: (cargo: Location, available: number) => [number] | []) {
-  let availability: [number, number] = [0, 0];
-
+function arrivals(
+  cargo: Destination[],
+  getTime: (cargo: Location, available: number) => [number] | [],
+  availability: [number, number] = [0, 0]
+) {
   return cargo.flatMap((c) => {
     const time = getTime(c === A ? Port : B, Math.min(...availability));
     const returnTime = getReturnTime(c === A ? Port : B);
