@@ -38,18 +38,26 @@ export function estimatedArrival(cargo: Destination[]) {
   );
 }
 
+function moveToA(c: 'A', trucksAvailability: [number, number], shipsAvailability: number[]) {
+  return aArrival(
+    arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), trucksAvailability),
+    shipsAvailability
+  );
+}
+
+function moveToB(c: 'B', trucksAvailability: [number, number]) {
+  return arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), trucksAvailability);
+}
+
 export function estimatedArrivalTwo(cargo: Destination[]) {
-  let availability: [number, number] = [0, 0];
-  let shipAvailability = [0];
+  let trucksAvailability: [number, number] = [0, 0];
+  let shipsAvailability = [0];
   const deliveries = cargo.flatMap((c) => {
     switch (c) {
       case A:
-        return aArrival(
-          arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), availability),
-          shipAvailability
-        );
+        return moveToA(c, trucksAvailability, shipsAvailability);
       case B:
-        return arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), availability);
+        return moveToB(c, trucksAvailability);
     }
   });
   return Math.max(...deliveries);
