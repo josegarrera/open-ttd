@@ -1,25 +1,41 @@
 import { CargoDestination } from './tycoon';
 
 export function estimatedArrival(cargo: CargoDestination[]) {
-  return Math.max(...aArrival(portArrival(cargo)), ...bArrival(cargo));
+  return Math.max(
+    ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, 'A', 1))),
+    ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, 'B', 5))
+  );
 }
 
-function truck(cargo: CargoDestination[], destination: string, travelTime: number) {
-  let currentAvailability: [number, number] = [0, 0];
-  const arrivalTimes = [];
-  for (let i = 0; i < cargo.length; i++) {
-    if (cargo.slice(i)[0] === destination) arrivalTimes.push(Math.min(...currentAvailability) + travelTime);
-    [currentAvailability] = truckAvailability(currentAvailability, cargo.slice(i));
+function calculateArrivalTime(
+  cargo: CargoDestination,
+  now: number,
+  destination: string,
+  travelTime: number
+): [number] | [] {
+  if (cargo === destination) {
+    return [now + travelTime];
+  } else {
+    return [];
   }
-  return arrivalTimes;
+}
+
+function arrivals(cargo: CargoDestination[], getTime: (cargo: CargoDestination, available: number) => [number] | []) {
+  let availability: [number, number] = [0, 0];
+
+  return cargo.flatMap((c) => {
+    const time = getTime(c, Math.min(...availability));
+    [availability] = truckAvailability(availability, c === 'A' ? 2 : 10);
+    return time;
+  });
 }
 
 export function portArrival(cargo: CargoDestination[]) {
-  return truck(cargo, 'A', 1);
+  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, 'A', 1));
 }
 
 export function bArrival(cargo: CargoDestination[]) {
-  return truck(cargo, 'B', 5);
+  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, 'B', 5));
 }
 
 export function aArrival(portArrival: number[]) {
@@ -31,15 +47,10 @@ export function aArrival(portArrival: number[]) {
   });
 }
 
-function truckAvailability(
-  availability: [number, number],
-  cargo: CargoDestination[]
-): [[number, number], CargoDestination[]] {
-  if (cargo.length === 0) return [availability, cargo];
+function truckAvailability(availability: [number, number], returnTime: number): [[number, number]] {
   const [t1, t2] = availability;
   let updatedAvailability: [number, number];
-  const returnTime = cargo[0] === 'A' ? 2 : 10;
   if (t1 <= t2) updatedAvailability = [t1 + returnTime, t2];
   else updatedAvailability = [t1, t2 + returnTime];
-  return [updatedAvailability, cargo.slice(1)];
+  return [updatedAvailability];
 }
