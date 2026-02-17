@@ -50,7 +50,7 @@ function calculateArrivalTime(
   }
 }
 
-function getReturnTime(c: 'B' | 'Port' | 'A') {
+function getReturnTime(c: Location) {
   const locationsTable = {
     [aInfo.nextLocation]: aInfo.distance * 2,
     [portInfo.nextLocation]: portInfo.distance * 2,
