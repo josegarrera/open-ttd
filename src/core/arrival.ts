@@ -43,14 +43,26 @@ export function moveCargo(
   trucksAvailability: [number, number] = [0, 0],
   shipsAvailability: number[] = [0]
 ) {
-  return cargo.flatMap((c) => {
-    switch (c) {
-      case A:
-        return moveToA([c], trucksAvailability, shipsAvailability);
-      case B:
-        return moveToB([c], trucksAvailability);
-    }
-  });
+  return cargo.flatMap((c) => decide(c)([c], trucksAvailability, shipsAvailability));
+}
+
+function decide(
+  c: Destination
+): (c: Destination[], trucksAvailability: [number, number], shipsAvailability: number[]) => number[] {
+  switch (c) {
+    case A:
+      return moveToA as unknown as (
+        c: Destination[],
+        trucksAvailability: [number, number],
+        shipsAvailability: number[]
+      ) => number[];
+    case B:
+      return moveToB as unknown as (
+        c: Destination[],
+        trucksAvailability: [number, number],
+        shipsAvailability: number[]
+      ) => number[];
+  }
 }
 
 export function moveToA(
