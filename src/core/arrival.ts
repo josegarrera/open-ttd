@@ -83,7 +83,7 @@ export function aArrival(portArrival: number[]) {
   return portArrival.map((arrival) => {
     const timeAtDeparture = Math.max(shipAvailability, arrival);
     const deliveredAt = timeAtDeparture + aInfo.distance;
-    shipAvailability = timeAtDeparture + getReturnTime('A');
+    shipAvailability = timeAtDeparture + getReturnTime(A);
     return deliveredAt;
   });
 }
