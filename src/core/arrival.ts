@@ -5,18 +5,32 @@ const B = 'B';
 const distanceToPort = 1;
 const distanceToB = 5;
 
+type LocationInfo = {
+  label: 'A' | 'B';
+  distance: number;
+};
+
+const Aplus: LocationInfo = {
+  label: A,
+  distance: distanceToPort,
+};
+
+const Bplus: LocationInfo = {
+  label: B,
+  distance: distanceToB,
+};
+
 export function estimatedArrival(cargo: CargoDestination[]) {
   return Math.max(
-    ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, A, distanceToPort))),
-    ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, B, distanceToB))
+    ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Aplus))),
+    ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Bplus))
   );
 }
 
 function calculateArrivalTime(
   cargo: CargoDestination,
   now: number,
-  destination: string,
-  travelTime: number
+  { label: destination, distance: travelTime }: LocationInfo
 ): [number] | [] {
   if (cargo === destination) {
     return [now + travelTime];
@@ -36,11 +50,11 @@ function arrivals(cargo: CargoDestination[], getTime: (cargo: CargoDestination, 
 }
 
 export function portArrival(cargo: CargoDestination[]) {
-  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, 'A', 1));
+  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Aplus));
 }
 
 export function bArrival(cargo: CargoDestination[]) {
-  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, 'B', 5));
+  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, Bplus));
 }
 
 export function aArrival(portArrival: number[]) {
