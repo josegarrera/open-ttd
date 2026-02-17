@@ -1,4 +1,4 @@
-import { Location, Destination } from './tycoon';
+import { Destination, Location } from './tycoon';
 
 export const A = 'A';
 export const B = 'B';
@@ -58,13 +58,17 @@ export function moveToA(
   trucksAvailability: [number, number] = [0, 0],
   shipsAvailability: number[] = [0]
 ) {
-  return arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability).map((arrival) =>
-    aArrival(arrival, shipsAvailability)
+  return c.flatMap((cargo) =>
+    arrivals(cargo, (nextStop: Location, av: number) => [getArrivalTime(av, nextStop)], trucksAvailability).map(
+      (arrival) => aArrival(arrival, shipsAvailability)
+    )
   );
 }
 
 export function moveToB(c: Destination[], trucksAvailability: [number, number] = [0, 0]) {
-  return arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability);
+  return c.flatMap((cargo) =>
+    arrivals(cargo, (nextStop: Location, av: number) => [getArrivalTime(av, nextStop)], trucksAvailability)
+  );
 }
 
 function getReturnTime(c: Location) {
@@ -86,22 +90,22 @@ function getArrivalTime(now: number, nextStop: Location) {
 }
 
 function arrivals(
-  cargo: Destination[],
+  cargo: Destination,
   getTime: (cargo: Location, available: number) => [number] | [],
   availability: [number, number] = [0, 0]
 ) {
-  return cargo.flatMap((c) => {
-    const time = getTime(c === A ? Port : B, Math.min(...availability));
-    const returnTime = getReturnTime(c === A ? Port : B);
-    const [[t1, t2]] = truckAvailability(availability, returnTime);
-    availability[0] = t1;
-    availability[1] = t2;
-    return time;
-  });
+  const time = getTime(cargo === A ? Port : B, Math.min(...availability));
+  const returnTime = getReturnTime(cargo === A ? Port : B);
+  const [[t1, t2]] = truckAvailability(availability, returnTime);
+  availability[0] = t1;
+  availability[1] = t2;
+  return time;
 }
 
-export function portArrival(cargo: Destination[]) {
-  return arrivals(cargo, (nextStop, av) => [getArrivalTime(av, nextStop)]);
+export function portArrival(cargo: Destination[], truckAvailability: [number, number] = [0, 0]) {
+  return cargo.flatMap((c) =>
+    arrivals(c, (nextStop: Location, av: number) => [getArrivalTime(av, nextStop)], truckAvailability)
+  );
 }
 
 export function aArrival(arrival: number, shipAvailability = [0]) {
