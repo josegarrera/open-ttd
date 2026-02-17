@@ -55,7 +55,7 @@ How do we go to the port? Assuming ['B', 'PORT']
  */
 
 import { Location, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon, Destination } from '../core/tycoon';
-import { aArrival, bArrival, estimatedArrival, estimatedArrivalTwo, portArrival } from '../core/arrival';
+import { aArrival, bArrival, estimatedArrival, portArrival } from '../core/arrival';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -161,9 +161,6 @@ describe('Tycoon', () => {
       });
       it('arrival time', () => {
         expect(estimatedArrival(cargo)).toBe(29);
-      });
-      it('arrival time', () => {
-        expect(estimatedArrivalTwo(cargo)).toBe(estimatedArrival(cargo));
       });
     });
   });

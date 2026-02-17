@@ -31,13 +31,6 @@ const bInfo: LocationInfo = {
   distance: distanceToB,
 };
 
-export function estimatedArrival(cargo: Destination[]) {
-  return Math.max(
-    ...aArrival(arrivals(cargo, (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo))),
-    ...arrivals(cargo, (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo))
-  );
-}
-
 function moveToA(c: 'A', trucksAvailability: [number, number], shipsAvailability: number[]) {
   return aArrival(
     arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), trucksAvailability),
@@ -49,7 +42,7 @@ function moveToB(c: 'B', trucksAvailability: [number, number]) {
   return arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), trucksAvailability);
 }
 
-export function estimatedArrivalTwo(cargo: Destination[]) {
+export function estimatedArrival(cargo: Destination[]) {
   let trucksAvailability: [number, number] = [0, 0];
   let shipsAvailability = [0];
   const deliveries = cargo.flatMap((c) => {
