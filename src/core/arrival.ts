@@ -38,6 +38,23 @@ export function estimatedArrival(cargo: Destination[]) {
   );
 }
 
+export function estimatedArrivalTwo(cargo: Destination[]) {
+  let availability: [number, number] = [0, 0];
+  let shipAvailability = [0];
+  const deliveries = cargo.flatMap((c) => {
+    switch (c) {
+      case A:
+        return aArrival(
+          arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), availability),
+          shipAvailability
+        );
+      case B:
+        return arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), availability);
+    }
+  });
+  return Math.max(...deliveries);
+}
+
 function calculateArrivalTime(
   cargo: Location,
   now: number,
@@ -67,7 +84,9 @@ function arrivals(
   return cargo.flatMap((c) => {
     const time = getTime(c === A ? Port : B, Math.min(...availability));
     const returnTime = getReturnTime(c === A ? Port : B);
-    [availability] = truckAvailability(availability, returnTime);
+    const [[t1, t2]] = truckAvailability(availability, returnTime);
+    availability[0] = t1;
+    availability[1] = t2;
     return time;
   });
 }
@@ -80,12 +99,11 @@ export function bArrival(cargo: Destination[]) {
   return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, bInfo));
 }
 
-export function aArrival(portArrival: number[]) {
-  let shipAvailability = 0;
+export function aArrival(portArrival: number[], shipAvailability = [0]) {
   return portArrival.map((arrival) => {
-    const timeAtDeparture = Math.max(shipAvailability, arrival);
+    const timeAtDeparture = Math.max(...shipAvailability, arrival);
     const deliveredAt = timeAtDeparture + aInfo.distance;
-    shipAvailability = timeAtDeparture + getReturnTime(A);
+    shipAvailability[0] = timeAtDeparture + getReturnTime(A);
     return deliveredAt;
   });
 }
