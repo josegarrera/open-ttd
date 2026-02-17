@@ -67,6 +67,7 @@ export function moveToA(
 export function moveToB(c: Destination[], trucksAvailability: [number, number] = [0, 0]) {
   return arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability);
 }
+
 function getReturnTime(c: Location) {
   const locationsTable = {
     [aInfo.nextLocation]: aInfo.distance * 2,
