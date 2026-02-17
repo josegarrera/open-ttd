@@ -58,9 +58,8 @@ export function moveToA(
   trucksAvailability: [number, number] = [0, 0],
   shipsAvailability: number[] = [0]
 ) {
-  return aArrival(
-    arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability),
-    shipsAvailability
+  return arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability).map((arrival) =>
+    aArrival(arrival, shipsAvailability)
   );
 }
 
@@ -105,13 +104,11 @@ export function portArrival(cargo: Destination[]) {
   return arrivals(cargo, (nextStop, av) => [getArrivalTime(av, nextStop)]);
 }
 
-export function aArrival(portArrival: number[], shipAvailability = [0]) {
-  return portArrival.map((arrival) => {
-    const timeAtDeparture = Math.max(...shipAvailability, arrival);
-    const deliveredAt = timeAtDeparture + aInfo.distance;
-    shipAvailability[0] = timeAtDeparture + getReturnTime(A);
-    return deliveredAt;
-  });
+export function aArrival(arrival: number, shipAvailability = [0]) {
+  const timeAtDeparture = Math.max(...shipAvailability, arrival);
+  const deliveredAt = timeAtDeparture + aInfo.distance;
+  shipAvailability[0] = timeAtDeparture + getReturnTime(A);
+  return deliveredAt;
 }
 
 function truckAvailability(availability: [number, number], returnTime: number): [[number, number]] {
