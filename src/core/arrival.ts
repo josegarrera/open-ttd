@@ -1,7 +1,7 @@
 import { Location, Destination } from './tycoon';
 
-const A = 'A';
-const B = 'B';
+export const A = 'A';
+export const B = 'B';
 const Port = 'Port';
 const distanceToPort = 1;
 const distanceToB = 5;
@@ -31,41 +31,45 @@ const bInfo: LocationInfo = {
   distance: distanceToB,
 };
 
-function moveToA(c: 'A', trucksAvailability: [number, number], shipsAvailability: number[]) {
+export function moveToA(
+  c: Destination[],
+  trucksAvailability: [number, number] = [0, 0],
+  shipsAvailability: number[] = [0]
+) {
   return aArrival(
-    arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), trucksAvailability),
+    arrivals(c, (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), trucksAvailability),
     shipsAvailability
   );
 }
 
-function moveToB(c: 'B', trucksAvailability: [number, number]) {
-  return arrivals([c], (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), trucksAvailability);
+export function moveToB(c: Destination[], trucksAvailability: [number, number] = [0, 0]) {
+  return arrivals(c, (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), trucksAvailability);
+}
+
+export function moveCargo(
+  cargo: Destination[],
+  trucksAvailability: [number, number] = [0, 0],
+  shipsAvailability: number[] = [0]
+) {
+  return cargo.flatMap((c) => {
+    switch (c) {
+      case A:
+        return moveToA([c], trucksAvailability, shipsAvailability);
+      case B:
+        return moveToB([c], trucksAvailability);
+    }
+  });
 }
 
 export function estimatedArrival(cargo: Destination[]) {
   let trucksAvailability: [number, number] = [0, 0];
   let shipsAvailability = [0];
-  const deliveries = cargo.flatMap((c) => {
-    switch (c) {
-      case A:
-        return moveToA(c, trucksAvailability, shipsAvailability);
-      case B:
-        return moveToB(c, trucksAvailability);
-    }
-  });
+  const deliveries = moveCargo(cargo, trucksAvailability, shipsAvailability);
   return Math.max(...deliveries);
 }
 
-function calculateArrivalTime(
-  cargo: Location,
-  now: number,
-  { nextLocation: destination, distance: travelTime }: LocationInfo
-): [number] | [] {
-  if (cargo === destination) {
-    return [now + travelTime];
-  } else {
-    return [];
-  }
+function calculateArrivalTime(_cargo: Location, now: number, { distance: travelTime }: LocationInfo): [number] | [] {
+  return [now + travelTime];
 }
 
 function getReturnTime(c: Location) {

@@ -55,7 +55,7 @@ How do we go to the port? Assuming ['B', 'PORT']
  */
 
 import { Location, Estimate, Sent, SENT_TO_B, SENT_TO_PORT, Tycoon, Destination } from '../core/tycoon';
-import { aArrival, bArrival, estimatedArrival, portArrival } from '../core/arrival';
+import { A, B, estimatedArrival, moveCargo, moveToA, moveToB, portArrival } from '../core/arrival';
 
 describe('Tycoon', () => {
   it('when remaining cargo is empty, no need to travel', () => {
@@ -147,17 +147,19 @@ describe('Tycoon', () => {
       (22, 26) --> []
        */
       it('all containers arrive at their destination', () => {
-        expect(aArrival(portArrival(cargo))).toHaveLength(4);
-        expect(bArrival(cargo)).toHaveLength(4);
+        expect(moveCargo(cargo)).toHaveLength(8);
       });
       it('arrival time at Port', () => {
-        expect(portArrival(cargo)).toMatchObject([1, 1, 3, 15]);
+        expect(portArrival(cargo.filter((c) => c === A))).toMatchObject([1, 1, 3, 3]);
       });
-      it('arrival time at B', () => {
-        expect(bArrival(cargo)).toMatchObject([7, 9, 17, 21]);
+      it('arrival time at A + B', () => {
+        expect(moveCargo(cargo)).toMatchObject([5, 13, 7, 21, 9, 17, 29, 21]);
       });
       it('arrival time at A', () => {
-        expect(aArrival(portArrival(cargo))).toMatchObject([5, 13, 21, 29]);
+        expect(moveToA(cargo.filter((c) => c === A))).toMatchObject([5, 13, 21, 29]);
+      });
+      it('arrival time at B', () => {
+        expect(moveToB(cargo.filter((c) => c === B))).toMatchObject([5, 5, 15, 15]);
       });
       it('arrival time', () => {
         expect(estimatedArrival(cargo)).toBe(29);
