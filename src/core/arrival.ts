@@ -33,8 +33,8 @@ const bInfo: LocationInfo = {
 
 export function estimatedArrival(cargo: Destination[]) {
   return Math.max(
-    ...aArrival(arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, portInfo))),
-    ...arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, bInfo))
+    ...aArrival(arrivals(cargo, (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo))),
+    ...arrivals(cargo, (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo))
   );
 }
 
