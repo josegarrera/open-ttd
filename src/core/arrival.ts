@@ -31,19 +31,11 @@ const bInfo: LocationInfo = {
   distance: distanceToB,
 };
 
-export function moveToA(
-  c: Destination[],
-  trucksAvailability: [number, number] = [0, 0],
-  shipsAvailability: number[] = [0]
-) {
-  return aArrival(
-    arrivals(c, (nextStop, av) => calculateArrivalTime(nextStop, av, portInfo), trucksAvailability),
-    shipsAvailability
-  );
-}
-
-export function moveToB(c: Destination[], trucksAvailability: [number, number] = [0, 0]) {
-  return arrivals(c, (nextStop, av) => calculateArrivalTime(nextStop, av, bInfo), trucksAvailability);
+export function estimatedArrival(cargo: Destination[]) {
+  let trucksAvailability: [number, number] = [0, 0];
+  let shipsAvailability = [0];
+  const deliveries = moveCargo(cargo, trucksAvailability, shipsAvailability);
+  return Math.max(...deliveries);
 }
 
 export function moveCargo(
@@ -61,17 +53,20 @@ export function moveCargo(
   });
 }
 
-export function estimatedArrival(cargo: Destination[]) {
-  let trucksAvailability: [number, number] = [0, 0];
-  let shipsAvailability = [0];
-  const deliveries = moveCargo(cargo, trucksAvailability, shipsAvailability);
-  return Math.max(...deliveries);
+export function moveToA(
+  c: Destination[],
+  trucksAvailability: [number, number] = [0, 0],
+  shipsAvailability: number[] = [0]
+) {
+  return aArrival(
+    arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability),
+    shipsAvailability
+  );
 }
 
-function calculateArrivalTime(_cargo: Location, now: number, { distance: travelTime }: LocationInfo): [number] | [] {
-  return [now + travelTime];
+export function moveToB(c: Destination[], trucksAvailability: [number, number] = [0, 0]) {
+  return arrivals(c, (nextStop, av) => [getArrivalTime(av, nextStop)], trucksAvailability);
 }
-
 function getReturnTime(c: Location) {
   const locationsTable = {
     [aInfo.nextLocation]: aInfo.distance * 2,
@@ -79,6 +74,15 @@ function getReturnTime(c: Location) {
     [bInfo.nextLocation]: bInfo.distance * 2,
   };
   return locationsTable[c];
+}
+
+function getArrivalTime(now: number, nextStop: Location) {
+  const locationsTable = {
+    [aInfo.nextLocation]: aInfo.distance,
+    [portInfo.nextLocation]: portInfo.distance,
+    [bInfo.nextLocation]: bInfo.distance,
+  };
+  return now + locationsTable[nextStop];
 }
 
 function arrivals(
@@ -97,11 +101,7 @@ function arrivals(
 }
 
 export function portArrival(cargo: Destination[]) {
-  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, portInfo));
-}
-
-export function bArrival(cargo: Destination[]) {
-  return arrivals(cargo, (cargo, av) => calculateArrivalTime(cargo, av, bInfo));
+  return arrivals(cargo, (nextStop, av) => [getArrivalTime(av, nextStop)]);
 }
 
 export function aArrival(portArrival: number[], shipAvailability = [0]) {
